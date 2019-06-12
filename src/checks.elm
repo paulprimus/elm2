@@ -10,7 +10,7 @@ type alias Check =
 
 
 type alias Checks =
-    { checks : List Check
+    { checkList : List Check
     }
 
 
@@ -20,7 +20,7 @@ type Msg
 
 init : Checks
 init =
-    { checks = [ { id = "1", checkName = "asdfsdfa" } ] }
+    { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] }
 
 
 view : Checks -> Html Msg

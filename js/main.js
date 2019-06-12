@@ -4392,9 +4392,11 @@ var elm$core$Set$toList = function (_n0) {
 	return elm$core$Dict$keys(dict);
 };
 var author$project$Checks$init = {
-	checks: _List_fromArray(
+	checkList: _List_fromArray(
 		[
-			{checkName: 'asdfsdfa', id: '1'}
+			{checkName: 'asdfsdfa', id: '1'},
+			{checkName: 'check 2', id: '2'},
+			{checkName: 'check 3', id: '3'}
 		])
 };
 var elm$core$Maybe$Just = function (a) {
@@ -4806,7 +4808,7 @@ var author$project$Main$loadCurrentPage = function (_n0) {
 					_Utils_update(
 						model,
 						{
-							checks: elm$core$Maybe$Just(m)
+							checkx: elm$core$Maybe$Just(m)
 						}),
 					elm$core$Platform$Cmd$none);
 			case 'CheckPage':
@@ -4820,7 +4822,7 @@ var author$project$Main$loadCurrentPage = function (_n0) {
 	return _Utils_Tuple2(v, k);
 };
 var author$project$Main$init = function (flags) {
-	var model = {checks: elm$core$Maybe$Nothing, counter: 0, page: author$project$Main$NonePage, text: flags};
+	var model = {checkx: elm$core$Maybe$Nothing, counter: 0, page: author$project$Main$NonePage, text: flags};
 	return author$project$Main$loadCurrentPage(
 		_Utils_Tuple2(model, elm$core$Platform$Cmd$none));
 };
@@ -4832,91 +4834,9 @@ var author$project$Main$subscriptions = function (model) {
 var author$project$Main$update = F2(
 	function (msg, model) {
 		return _Utils_Tuple2(
-			{checks: elm$core$Maybe$Nothing, counter: model.counter + 1, page: author$project$Main$NonePage, text: 'neuer wert'},
+			{checkx: elm$core$Maybe$Nothing, counter: model.counter + 1, page: author$project$Main$NonePage, text: 'neuer wert'},
 			elm$core$Platform$Cmd$none);
 	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
-var elm$json$Json$Decode$map = _Json_map1;
-var elm$json$Json$Decode$map2 = _Json_map2;
-var elm$json$Json$Decode$succeed = _Json_succeed;
-var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
-	switch (handler.$) {
-		case 'Normal':
-			return 0;
-		case 'MayStopPropagation':
-			return 1;
-		case 'MayPreventDefault':
-			return 2;
-		default:
-			return 3;
-	}
-};
-var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$parseChecks = function (m) {
-	if (m.$ === 'Nothing') {
-		return elm$html$Html$text('nothing');
-	} else {
-		var c = m.a;
-		return elm$html$Html$text('Es gibt checks');
-	}
-};
-var elm$html$Html$div = _VirtualDom_node('div');
-var elm$json$Json$Encode$string = _Json_wrap;
-var elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			elm$json$Json$Encode$string(string));
-	});
-var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
-var author$project$Main$view = function (model) {
-	return A2(
-		elm$html$Html$div,
-		_List_fromArray(
-			[
-				elm$html$Html$Attributes$class('row')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('col')
-					]),
-				_List_fromArray(
-					[
-						author$project$Main$parseChecks(model.checks)
-					]))
-			]));
-};
-var elm$browser$Browser$External = function (a) {
-	return {$: 'External', a: a};
-};
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 'Internal', a: a};
-};
-var elm$browser$Browser$Dom$NotFound = function (a) {
-	return {$: 'NotFound', a: a};
-};
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0.a;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
-	}
-};
-var elm$core$Task$Perform = function (a) {
-	return {$: 'Perform', a: a};
-};
-var elm$core$Task$succeed = _Scheduler_succeed;
-var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4972,6 +4892,17 @@ var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
+var elm$core$List$concat = function (lists) {
+	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
+};
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -4986,6 +4917,187 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var elm$json$Json$Decode$map = _Json_map1;
+var elm$json$Json$Decode$map2 = _Json_map2;
+var elm$json$Json$Decode$succeed = _Json_succeed;
+var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
+	switch (handler.$) {
+		case 'Normal':
+			return 0;
+		case 'MayStopPropagation':
+			return 1;
+		case 'MayPreventDefault':
+			return 2;
+		default:
+			return 3;
+	}
+};
+var elm$html$Html$table = _VirtualDom_node('table');
+var elm$html$Html$td = _VirtualDom_node('td');
+var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
+var elm$html$Html$th = _VirtualDom_node('th');
+var elm$html$Html$thead = _VirtualDom_node('thead');
+var elm$html$Html$tr = _VirtualDom_node('tr');
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var author$project$Main$checkTable = function (cr) {
+	return A2(
+		elm$html$Html$table,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('table')
+			]),
+		elm$core$List$concat(
+			_List_fromArray(
+				[
+					_List_fromArray(
+					[
+						A2(
+						elm$html$Html$thead,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('thead-dark')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								elm$html$Html$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('ID')
+									])),
+								A2(
+								elm$html$Html$th,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('Bezeichnung')
+									]))
+							]))
+					]),
+					A2(
+					elm$core$List$map,
+					function (c) {
+						return A2(
+							elm$html$Html$tr,
+							_List_Nil,
+							_List_fromArray(
+								[
+									A2(
+									elm$html$Html$td,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(c.id)
+										])),
+									A2(
+									elm$html$Html$td,
+									_List_Nil,
+									_List_fromArray(
+										[
+											elm$html$Html$text(c.checkName)
+										]))
+								]));
+					},
+					cr)
+				])));
+};
+var author$project$Main$parseChecks = function (m) {
+	if (m.$ === 'Nothing') {
+		return elm$html$Html$text('nothing');
+	} else {
+		var c = m.a;
+		return author$project$Main$checkTable(c.checkList);
+	}
+};
+var elm$html$Html$h2 = _VirtualDom_node('h2');
+var author$project$Main$headerText = function (s) {
+	return A2(
+		elm$html$Html$h2,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('text-center mt-5')
+			]),
+		_List_fromArray(
+			[
+				elm$html$Html$text(s)
+			]));
+};
+var author$project$Main$viewHeader = function (page) {
+	switch (page.$) {
+		case 'NonePage':
+			return author$project$Main$headerText('None');
+		case 'CheckPage':
+			return author$project$Main$headerText('Checks');
+		default:
+			return author$project$Main$headerText('Ergebnisse');
+	}
+};
+var elm$html$Html$div = _VirtualDom_node('div');
+var author$project$Main$view = function (model) {
+	var header = author$project$Main$viewHeader(model.page);
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				header,
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('row mt-5')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('col')
+							]),
+						_List_fromArray(
+							[
+								author$project$Main$parseChecks(model.checkx)
+							]))
+					]))
+			]));
+};
+var elm$browser$Browser$External = function (a) {
+	return {$: 'External', a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 'Internal', a: a};
+};
+var elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0.a;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
+var elm$core$Task$Perform = function (a) {
+	return {$: 'Perform', a: a};
+};
+var elm$core$Task$succeed = _Scheduler_succeed;
+var elm$core$Task$init = elm$core$Task$succeed(_Utils_Tuple0);
 var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$map = F2(
 	function (func, taskA) {
