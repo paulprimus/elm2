@@ -4803,6 +4803,8 @@ var author$project$Main$loadCurrentPage = function (_n0) {
 		var _n2 = model.page;
 		switch (_n2.$) {
 			case 'NonePage':
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+			case 'CheckPage':
 				var m = author$project$Checks$init;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -4811,8 +4813,6 @@ var author$project$Main$loadCurrentPage = function (_n0) {
 							checkx: elm$core$Maybe$Just(m)
 						}),
 					elm$core$Platform$Cmd$none);
-			case 'CheckPage':
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 		}
@@ -4821,20 +4821,50 @@ var author$project$Main$loadCurrentPage = function (_n0) {
 	var k = _n1.b;
 	return _Utils_Tuple2(v, k);
 };
-var author$project$Main$init = function (flags) {
-	var model = {checkx: elm$core$Maybe$Nothing, counter: 0, page: author$project$Main$NonePage, text: flags};
+var author$project$Main$init = function (_n0) {
+	var model = {checkx: elm$core$Maybe$Nothing, page: author$project$Main$NonePage};
 	return author$project$Main$loadCurrentPage(
 		_Utils_Tuple2(model, elm$core$Platform$Cmd$none));
 };
-var elm$core$Platform$Sub$batch = _Platform_batch;
-var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
-var author$project$Main$subscriptions = function (model) {
-	return elm$core$Platform$Sub$none;
+var author$project$Main$Navkey = function (a) {
+	return {$: 'Navkey', a: a};
+};
+var elm$json$Json$Decode$string = _Json_decodeString;
+var author$project$Main$selectedRoute = _Platform_incomingPort('selectedRoute', elm$json$Json$Decode$string);
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var author$project$Main$subscriptions = function (_n0) {
+	return author$project$Main$selectedRoute(author$project$Main$Navkey);
+};
+var author$project$Main$CheckPage = {$: 'CheckPage'};
+var author$project$Main$fromNavkey = function (navKey) {
+	switch (navKey) {
+		case 'checks':
+			return author$project$Main$CheckPage;
+		case 'ergebnisse':
+			return author$project$Main$NonePage;
+		default:
+			return author$project$Main$NonePage;
+	}
 };
 var author$project$Main$update = F2(
 	function (msg, model) {
+		var key = msg.a;
+		var page = author$project$Main$fromNavkey(key);
 		return _Utils_Tuple2(
-			{checkx: elm$core$Maybe$Nothing, counter: model.counter + 1, page: author$project$Main$NonePage, text: 'neuer wert'},
+			{
+				checkx: elm$core$Maybe$Just(
+					{
+						checkList: _List_fromArray(
+							[
+								{checkName: 'asdfsdfa', id: '1'},
+								{checkName: 'check 2', id: '2'},
+								{checkName: 'check 3', id: '3'}
+							])
+					}),
+				page: page
+			},
 			elm$core$Platform$Cmd$none);
 	});
 var elm$core$List$foldrHelper = F4(
@@ -4917,9 +4947,6 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -5038,7 +5065,7 @@ var author$project$Main$headerText = function (s) {
 var author$project$Main$viewHeader = function (page) {
 	switch (page.$) {
 		case 'NonePage':
-			return author$project$Main$headerText('None');
+			return author$project$Main$headerText('DQM Tool');
 		case 'CheckPage':
 			return author$project$Main$headerText('Checks');
 		default:
@@ -5302,7 +5329,6 @@ var elm$url$Url$fromString = function (str) {
 		A2(elm$core$String$dropLeft, 8, str)) : elm$core$Maybe$Nothing);
 };
 var elm$browser$Browser$element = _Browser_element;
-var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Main$main = elm$browser$Browser$element(
 	{init: author$project$Main$init, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(elm$json$Json$Decode$string)(0)}});}(this));

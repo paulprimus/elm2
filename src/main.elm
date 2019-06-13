@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser exposing (element)
 import Checks exposing (..)
@@ -22,12 +22,12 @@ main =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
+subscriptions _ =
+    selectedRoute Navkey
 
 
 type Msg
-    = Increment
+    = Navkey String
 
 
 type Page
@@ -36,19 +36,20 @@ type Page
     | ErgebnisPage
 
 
+port selectedRoute : (String -> msg) -> Sub msg
+
+
 type alias Model =
-    { counter : Int
-    , text : String
-    , page : Page
+    { page : Page
     , checkx : Maybe Checks
     }
 
 
 init : String -> ( Model, Cmd Msg )
-init flags =
+init _ =
     let
         model =
-            { counter = 0, text = flags, page = NonePage, checkx = Nothing }
+            { page = NonePage, checkx = Nothing }
     in
     ( model, Cmd.none ) |> loadCurrentPage
 
@@ -59,14 +60,14 @@ loadCurrentPage ( model, cmd ) =
         ( v, k ) =
             case model.page of
                 NonePage ->
+                    ( model, Cmd.none )
+
+                CheckPage ->
                     let
                         m =
                             Checks.init
                     in
                     ( { model | checkx = Just m }, Cmd.none )
-
-                CheckPage ->
-                    ( model, Cmd.none )
 
                 ErgebnisPage ->
                     ( model, Cmd.none )
@@ -93,7 +94,7 @@ viewHeader : Page -> Html Msg
 viewHeader page =
     case page of
         NonePage ->
-            headerText "None"
+            headerText "DQM Tool"
 
         CheckPage ->
             headerText "Checks"
@@ -137,8 +138,25 @@ checkTable cr =
             ]
 
 
+fromNavkey : String -> Page
+fromNavkey navKey =
+    case navKey of
+        "checks" ->
+            CheckPage
+
+        "ergebnisse" ->
+            NonePage
+
+        _ ->
+            NonePage
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            ( { counter = model.counter + 1, text = "neuer wert", page = NonePage, checkx = Nothing }, Cmd.none )
+        Navkey key ->
+            let
+                page =
+                    fromNavkey key
+            in
+            ( { page = page, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )
