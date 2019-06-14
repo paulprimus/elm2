@@ -5,6 +5,8 @@ import Checks exposing (..)
 import Html exposing (Html, button, div, h2, i, span, table, td, text, th, thead, tr)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
+import Http
+import Json.Decode exposing (Decoder, list)
 
 
 
@@ -28,6 +30,7 @@ subscriptions _ =
 
 type Msg
     = Navkey String
+    | ChecksReceived (Result Http.Error (List Check))
 
 
 type Page
@@ -138,6 +141,19 @@ checkTable cr =
             ]
 
 
+checkDecoder : Decoder Check
+checkDecoder =
+    decode Check
+        |> required "checkNumber" string
+        |> required "checkName" string
+
+
+httpGetChecksCommand =
+    list checkDecoder
+        |> Http.get "http://localhost:8080/api/checks/observ" checkDecoder
+        |> Http.send ChecksReceived
+
+
 fromNavkey : String -> Page
 fromNavkey navKey =
     case navKey of
@@ -155,8 +171,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Navkey key ->
-            let
-                page =
-                    fromNavkey key
-            in
-            ( { page = page, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )
+            ( model, httpGetChecksCommand )
+
+        -- let
+        --     page =
+        --         fromNavkey key
+        -- in
+        -- Http.send Http.get { url = "http://localhost:8080/api/checks/observ", expect = Http.expectJson ChecksReceived }
+        -- ( { page = page, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )
+        ChecksReceived list ->
+            ( { page = CheckPage, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )

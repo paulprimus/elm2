@@ -4831,12 +4831,10 @@ var author$project$Main$Navkey = function (a) {
 };
 var elm$json$Json$Decode$string = _Json_decodeString;
 var author$project$Main$selectedRoute = _Platform_incomingPort('selectedRoute', elm$json$Json$Decode$string);
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var author$project$Main$subscriptions = function (_n0) {
 	return author$project$Main$selectedRoute(author$project$Main$Navkey);
 };
+var author$project$Main$ErgebnisPage = {$: 'ErgebnisPage'};
 var author$project$Main$CheckPage = {$: 'CheckPage'};
 var author$project$Main$fromNavkey = function (navKey) {
 	switch (navKey) {
@@ -4850,22 +4848,40 @@ var author$project$Main$fromNavkey = function (navKey) {
 };
 var author$project$Main$update = F2(
 	function (msg, model) {
-		var key = msg.a;
-		var page = author$project$Main$fromNavkey(key);
-		return _Utils_Tuple2(
-			{
-				checkx: elm$core$Maybe$Just(
-					{
-						checkList: _List_fromArray(
-							[
-								{checkName: 'asdfsdfa', id: '1'},
-								{checkName: 'check 2', id: '2'},
-								{checkName: 'check 3', id: '3'}
-							])
-					}),
-				page: page
-			},
-			elm$core$Platform$Cmd$none);
+		if (msg.$ === 'Navkey') {
+			var key = msg.a;
+			var page = author$project$Main$fromNavkey(key);
+			return _Utils_Tuple2(
+				{
+					checkx: elm$core$Maybe$Just(
+						{
+							checkList: _List_fromArray(
+								[
+									{checkName: 'asdfsdfa', id: '1'},
+									{checkName: 'check 2', id: '2'},
+									{checkName: 'check 3', id: '3'}
+								])
+						}),
+					page: page
+				},
+				elm$core$Platform$Cmd$none);
+		} else {
+			var list = msg.a;
+			return _Utils_Tuple2(
+				{
+					checkx: elm$core$Maybe$Just(
+						{
+							checkList: _List_fromArray(
+								[
+									{checkName: 'asdfsdfa', id: '1'},
+									{checkName: 'check 2', id: '2'},
+									{checkName: 'check 3', id: '3'}
+								])
+						}),
+					page: author$project$Main$ErgebnisPage
+				},
+				elm$core$Platform$Cmd$none);
+		}
 	});
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
@@ -4947,6 +4963,9 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
