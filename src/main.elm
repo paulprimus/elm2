@@ -6,7 +6,7 @@ import Html exposing (Html, button, div, h2, i, span, table, td, text, th, thead
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (Decoder, list)
+import Json.Decode as D exposing (Decoder, list, map2)
 
 
 
@@ -143,15 +143,22 @@ checkTable cr =
 
 checkDecoder : Decoder Check
 checkDecoder =
-    decode Check
-        |> required "checkNumber" string
-        |> required "checkName" string
+    map2 Check
+        (D.field "checkNumber" D.string)
+        (D.field "checkName" D.string)
 
 
-httpGetChecksCommand =
-    list checkDecoder
-        |> Http.get "http://localhost:8080/api/checks/observ" checkDecoder
-        |> Http.send ChecksReceived
+checkListDecoder : Decoder (List Check)
+checkListDecoder =
+    D.list checkDecoder
+
+
+httpGetChecksCommand : Decoder (List Check)
+httpGetChecksCommand checkListDecoder =
+    Http.get
+        { url = "http://localhost:8080/api/checks/observ"
+        , expect = Http.expectJson checkListDecoder
+        }
 
 
 fromNavkey : String -> Page
