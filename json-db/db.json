@@ -1,0 +1,8 @@
+{
+    "checks": [
+      { "id": 1, "checkName": "check1"},
+      { "id": 2, "checkName": "check2"},
+      { "id": 3, "checkName": "check3"},
+      { "id": 4, "checkName": "check4"}
+    ]    
+}

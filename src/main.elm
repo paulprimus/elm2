@@ -37,6 +37,7 @@ type Page
     = NonePage
     | CheckPage
     | ErgebnisPage
+    | ErrorPage
 
 
 port selectedRoute : (String -> msg) -> Sub msg
@@ -54,11 +55,11 @@ init _ =
         model =
             { page = NonePage, checkx = Nothing }
     in
-    ( model, Cmd.none ) |> loadCurrentPage
+    ( model, Cmd.none ) |> loadPage
 
 
-loadCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
-loadCurrentPage ( model, cmd ) =
+loadPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+loadPage ( model, cmd ) =
     let
         ( v, k ) =
             case model.page of
@@ -73,6 +74,9 @@ loadCurrentPage ( model, cmd ) =
                     ( { model | checkx = Just m }, Cmd.none )
 
                 ErgebnisPage ->
+                    ( model, Cmd.none )
+
+                ErrorPage ->
                     ( model, Cmd.none )
     in
     ( v, k )
@@ -105,6 +109,9 @@ viewHeader page =
         ErgebnisPage ->
             headerText "Ergebnisse"
 
+        ErrorPage ->
+            headerText "Fehler"
+
 
 headerText : String -> Html Msg
 headerText s =
@@ -115,7 +122,7 @@ parseChecks : Maybe Checks -> Html Msg
 parseChecks m =
     case m of
         Nothing ->
-            text "nothing"
+            text "Keine Checks gefunden!"
 
         Just c ->
             checkTable c.checkList
@@ -133,7 +140,7 @@ checkTable cr =
             , List.map
                 (\c ->
                     tr []
-                        [ td [] [ text c.id ]
+                        [ td [] [ text (String.fromInt c.id) ]
                         , td [] [ text c.checkName ]
                         ]
                 )
@@ -144,7 +151,7 @@ checkTable cr =
 checkDecoder : Decoder Check
 checkDecoder =
     map2 Check
-        (D.field "checkNumber" D.string)
+        (D.field "id" D.int)
         (D.field "checkName" D.string)
 
 
@@ -153,38 +160,37 @@ checkListDecoder =
     D.list checkDecoder
 
 
-httpGetChecksCommand : Decoder (List Check)
-httpGetChecksCommand checkListDecoder =
+httpGetChecksCommand : Cmd Msg
+httpGetChecksCommand =
     Http.get
-        { url = "http://localhost:8080/api/checks/observ"
-        , expect = Http.expectJson checkListDecoder
+        { url = "http://localhost:3000/checks"
+        , expect = Http.expectJson ChecksReceived checkListDecoder
         }
 
 
-fromNavkey : String -> Page
-fromNavkey navKey =
-    case navKey of
-        "checks" ->
-            CheckPage
 
-        "ergebnisse" ->
-            NonePage
-
-        _ ->
-            NonePage
+-- fromNavkey : String -> Page
+-- fromNavkey navKey =
+--     case navKey of
+--         "checks" ->
+--             CheckPage
+--         "ergebnisse" ->
+--             NonePage
+--         _ ->
+--             NonePage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Navkey key ->
+            -- ( { page = CheckPage, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" } ] } }, Cmd.none )
             ( model, httpGetChecksCommand )
 
-        -- let
-        --     page =
-        --         fromNavkey key
-        -- in
-        -- Http.send Http.get { url = "http://localhost:8080/api/checks/observ", expect = Http.expectJson ChecksReceived }
-        -- ( { page = page, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )
-        ChecksReceived list ->
-            ( { page = CheckPage, checkx = Just { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] } }, Cmd.none )
+        ChecksReceived response ->
+            case response of
+                Ok checklist ->
+                    ( { page = CheckPage, checkx = Just { checkList = checklist } }, Cmd.none )
+
+                Err error ->
+                    ( { model | page = ErrorPage }, Cmd.none )

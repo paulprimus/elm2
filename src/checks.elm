@@ -4,7 +4,7 @@ import Html exposing (Html, div, text)
 
 
 type alias Check =
-    { id : String
+    { id : Int
     , checkName : String
     }
 
@@ -20,7 +20,7 @@ type Msg
 
 init : Checks
 init =
-    { checkList = [ { id = "1", checkName = "asdfsdfa" }, { id = "2", checkName = "check 2" }, { id = "3", checkName = "check 3" } ] }
+    { checkList = [ { id = 1, checkName = "asdfsdfa" }, { id = 2, checkName = "check 2" }, { id = 3, checkName = "check 3" } ] }
 
 
 view : Checks -> Html Msg
