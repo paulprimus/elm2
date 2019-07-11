@@ -14,7 +14,7 @@
 
 <body>
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-		<a class="navbar-brand" href="#">DQM</a>
+		<a class="navbar-brand" href="#" id="nav-home">DQM</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
 		 aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -59,6 +59,10 @@
 				$('#nav-item-ergebnisse').click(() => {
 					console.log("Nav: ergebnisse");
 					app.ports.selectedRoute.send('ergebnisse');
+				});
+				$('#nav-home').click(() => {
+					console.log("Nav: home");
+					app.ports.selectedRoute.send('home');
 				});
 			}
 
