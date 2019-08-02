@@ -1,129 +1,119 @@
-port module Main exposing (main)
+module Main exposing (main)
 
-import Browser exposing (element)
-import Checks
-import Html exposing (Html, button, div, h2, i, span, table, td, text, th, thead, tr)
-import Html.Attributes exposing (class, type_)
-import Html.Events exposing (onClick)
-import Http
-import Json.Decode as D exposing (Decoder, list, map2)
-import Task
-
-
-
----- Program ----
-
-
-main : Program String Model Msg
-main =
-    element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    case model of
-        MainPage ->
-            selectedRoute Navkey
-
-        CheckPage checklist ->
-            selectedRoute Navkey
+import Browser
+import Browser.Navigation as Nav
+import Html exposing (Html, a, button, div, li, text, ul)
+import Html.Attributes exposing (class, href, id, type_)
+import Url
 
 
 type Msg
-    = Navkey String
-    | ChecksMsg Checks.Msg
+    = LinkClicked Browser.UrlRequest
+    | UrlChanged Url.Url
+    | LoadChecks
 
 
-type Model
-    = MainPage
-    | CheckPage Checks.Model
+type alias Check =
+    { id : Int
+    , checkName : String
+    , beschreibung : String
+    , sqlQuery : String
+    }
 
 
-port selectedRoute : (String -> msg) -> Sub msg
-
-
-init : String -> ( Model, Cmd Msg )
-init _ =
-    let
-        model =
-            MainPage
-    in
-    ( model, Cmd.none )
-
-
-
--- loadPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
--- loadPage ( model, cmd ) =
---     ( model, Cmd.none )
-
-
-view : Model -> Html Msg
-view model =
-    case model of
-        MainPage ->
-            h2 [ class "text-center mt-5" ] [ text "DQM-Tool" ]
-
-        CheckPage page ->
-            Html.map ChecksMsg (Checks.view page)
-
-
-fromNavkey : String -> Model -> ( Model, Cmd Msg )
-fromNavkey navKey model =
-    case navKey of
-        "checks" ->
-            Checks.init |> updateWith CheckPage ChecksMsg model
-
-        "ergebnisse" ->
-            ( MainPage, Cmd.none )
-
-        "home" ->
-            ( MainPage, Cmd.none )
-
-        _ ->
-            ( model, Cmd.none )
+type alias Model =
+    { key : Nav.Key
+    , url : Url.Url
+    , checklist : List Check
+    }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case ( msg, model ) of
-        ( Navkey key, _ ) ->
-            let
-                _ =
-                    Debug.log " update Navkey" key
-            in
-            fromNavkey key model
+    case msg of
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
 
-        --   Checks.init |> updateWith CheckPage ChecksMsg model
-        ( ChecksMsg subMsg, CheckPage page ) ->
-            let
-                _ =
-                    Debug.log " update ChecksMsg" subMsg
-            in
-            Checks.update subMsg page |> updateWith CheckPage ChecksMsg model
+                Browser.External href ->
+                    ( model, Nav.load href )
 
-        ( _, _ ) ->
+        UrlChanged url ->
+            ( { model | url = url }
+            , Cmd.none
+            )
+
+        LoadChecks ->
             ( model, Cmd.none )
 
 
+viewNavibar : Model -> Html Msg
+viewNavibar model =
+    div [ class "navbar navbar-expand-md navbar-dark bg-dark" ]
+        [ a [ class "navbar-brand" ] [ text "DQM" ]
 
---( MainPage, Cmd.none )
+        --   , button [ class "navbar-toggler", type_ "button" ] [ text "button" ]
+        , div [ class "collapse navbar-collapse", id "navbarSupportedContent" ]
+            [ ul [ class "navbar-nav mr-auto" ]
+                [ viewLink "/home"
+                , viewLink "/checks"
+                , viewLink "/ergebnisse"
+                ]
+            ]
+        ]
 
 
-updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
-updateWith toModel toMsg model ( subModel, subCmd ) =
-    ( toModel subModel
-    , Cmd.map toMsg subCmd
-    )
+viewLink : String -> Html msg
+viewLink path =
+    li [ class "nav-link" ] [ a [ href path ] [ text path ] ]
+
+
+viewContent model =
+    div [ class "text-center" ] [ text "DQM Home" ]
 
 
 
--- updateWith : (subModel -> Model) -> (subMsg -> Msg) -> Model -> ( subModel, Cmd subMsg ) -> ( Model, Cmd Msg )
--- updateWith toModel toMsg model ( subModel, subCmd ) =
---     ( toModel subModel
---     , Cmd.map toMsg subCmd
---     )
+--  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+-- 	<a class="navbar-brand" href="#" id="nav-home">DQM</a>
+-- 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+-- 	 aria-expanded="false" aria-label="Toggle navigation">
+-- 		<span class="navbar-toggler-icon"></span>
+-- 	</button>
+-- 	<div class="collapse navbar-collapse" id="navbarSupportedContent">
+-- 		<ul class="navbar-nav mr-auto">
+-- 			<li id="nav-item-checks" class="nav-item"><a class="nav-link" href="#">Checks</a></li>
+-- 			<li id="nav-item-ergebnisse" class="nav-item"><a class="nav-link" href="#">Ergebnisse</a></li>
+-- 		</ul>
+-- 	</div>
+-- </nav>
+--
+
+
+view : Model -> Browser.Document Msg
+view model =
+    { title = "DQM-Tool "
+    , body = [ viewNavibar model ]
+    }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init flags url key =
+    ( Model key url [], Cmd.none )
+
+
+main : Program () Model Msg
+main =
+    Browser.application
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
+        }

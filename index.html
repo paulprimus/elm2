@@ -13,26 +13,7 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
-		<a class="navbar-brand" href="#" id="nav-home">DQM</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-		 aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto">
-				<li id="nav-item-checks" class="nav-item"><a class="nav-link" href="#">Checks</a></li>
-				<li id="nav-item-ergebnisse" class="nav-item"><a class="nav-link" href="#">Ergebnisse</a></li>
-			</ul>
-		</div>
-	</nav>
-	<div class="container mt-3">
-		<div class="row">
-			<div class="col">
-				<div id="elm"></div>
-			</div>
-		</div>
-	</div>
+	<div id="elm"></div>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/popper.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -44,38 +25,15 @@
 			let init = function () {
 				app = Elm.Main.init({
 					node: document.getElementById('elm'),
-					flags: 'flagggg'
-				});
-
-				//app.ports.selectedRoute.send('none');
-	
-			}
-
-			let onNavClicked = function () {
-				$('#nav-item-checks').click(() => {
-					console.log("Nav: checks");
-					app.ports.selectedRoute.send('checks');
-				});
-				$('#nav-item-ergebnisse').click(() => {
-					console.log("Nav: ergebnisse");
-					app.ports.selectedRoute.send('ergebnisse');
-				});
-				$('#nav-home').click(() => {
-					console.log("Nav: home");
-					app.ports.selectedRoute.send('home');
 				});
 			}
-
 			return {
 				init: init,
-				onNavClicked: onNavClicked
 			}
 		})()
 		$(function () {
 			Elm2.init();
-			Elm2.onNavClicked();
 		});
 	</script>
 </body>
-
 </html>
